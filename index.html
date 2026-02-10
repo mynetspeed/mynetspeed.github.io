@@ -1,37 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyNetSpeed – Internet Speed Test</title>
-  <meta name="description" content="MyNetSpeed – Accurate internet speed test with live meter. Download, upload and ping." />
-
-  <style>
-    body{
-      margin:0;font-family:'Segoe UI',Tahoma,sans-serif;
-      background:radial-gradient(circle at top,#020617,#000);
-      color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;
-    }
-    .card{width:380px;background:#020617;border-radius:20px;padding:28px;box-shadow:0 25px 50px rgba(0,0,0,.8);text-align:center}
-    h1{margin:0;color:#22c55e;font-size:28px}
-    .sub{font-size:14px;opacity:.7;margin-bottom:20px}
-
-    .meter-wrap{width:220px;height:110px;margin:0 auto 20px;position:relative;overflow:hidden}
-    .meter{width:220px;height:220px;border-radius:50%;background:conic-gradient(#22c55e 0deg,#1e293b 0deg);position:absolute;bottom:0;left:0;transition:background .3s}
-    .meter-center{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:170px;height:85px;background:#020617;border-top-left-radius:170px;border-top-right-radius:170px;display:flex;justify-content:center;align-items:center;font-size:22px;font-weight:bold;color:#38bdf8}
-
-    .speed-box{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-    .item{background:#0f172a;border-radius:12px;padding:12px}
-    .label{font-size:12px;opacity:.6}
-    .value{font-size:18px;font-weight:bold;margin-top:4px;color:#38bdf8}
-
-    button{width:100%;padding:14px;font-size:16px;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,#22c55e,#4ade80);color:#000;font-weight:bold}
-    button:disabled{opacity:.6}
-    footer{margin-top:16px;font-size:12px;opacity:.45}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyNetSpeed – Internet Speed Test</title>
+<style>
+body{margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:radial-gradient(circle at top,#020617,#000);color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.card{width:380px;background:#020617;border-radius:20px;padding:28px;box-shadow:0 25px 50px rgba(0,0,0,.8);text-align:center}
+h1{margin:0;color:#22c55e;font-size:28px}
+.sub{font-size:14px;opacity:.7;margin-bottom:20px}
+.meter-wrap{width:220px;height:110px;margin:0 auto 20px;position:relative;overflow:hidden}
+.meter{width:220px;height:220px;border-radius:50%;background:conic-gradient(#22c55e 0deg,#1e293b 0deg);position:absolute;bottom:0;left:0;transition:background .3s}
+.meter-center{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:170px;height:85px;background:#020617;border-top-left-radius:170px;border-top-right-radius:170px;display:flex;justify-content:center;align-items:center;font-size:22px;font-weight:bold;color:#38bdf8}
+.speed-box{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.item{background:#0f172a;border-radius:12px;padding:12px}
+.label{font-size:12px;opacity:.6}
+.value{font-size:18px;font-weight:bold;margin-top:4px;color:#38bdf8}
+button{width:100%;padding:14px;font-size:16px;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,#22c55e,#4ade80);color:#000;font-weight:bold}
+button:disabled{opacity:.6}
+footer{margin-top:16px;font-size:12px;opacity:.45}
+</style>
 </head>
 <body>
-
 <div class="card">
   <h1>MyNetSpeed</h1>
   <div class="sub">Accurate Live Speed Test</div>
@@ -43,9 +33,8 @@
 
   <div class="speed-box">
     <div class="item"><div class="label">Download</div><div class="value" id="download">-- Mbps</div></div>
-    <div class="item"><div class="label">Upload</div><div class="value" id="upload">-- Mbps</div></div>
     <div class="item"><div class="label">Ping</div><div class="value" id="ping">-- ms</div></div>
-    <div class="item"><div class="label">Test Time</div><div class="value">~8 sec</div></div>
+    <div class="item"><div class="label">Test Time</div><div class="value" id="time">~10 sec</div></div>
   </div>
 
   <button id="btn">Start Test</button>
@@ -53,46 +42,56 @@
 </div>
 
 <script>
-async function testDownloadSpeed() {
-  const duration = 30000; // 30 seconds
-  const testUrl = "https://speed.hetzner.de/100MB.bin?cache=" + Math.random();
+const btn=document.getElementById('btn');
 
-  let startTime = performance.now();
-  let bytesReceived = 0;
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), duration);
-
-  try {
-    const response = await fetch(testUrl, {
-      signal: controller.signal,
-      cache: "no-store"
-    });
-
-    const reader = response.body.getReader();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      bytesReceived += value.length;
-
-      const elapsed = (performance.now() - startTime) / 1000;
-      const speedMbps = ((bytesReceived * 8) / elapsed / 1024 / 1024).toFixed(2);
-
-      document.getElementById("downloadSpeed").innerText = speedMbps + " Mbps";
-      updateMeter(speedMbps);
-    }
-  } catch (e) {
-    console.log("Download test finished");
-  }
-
-  clearTimeout(timeout);
+function updateMeter(speed){
+const meter=document.getElementById('meter');
+const meterText=document.getElementById('meterText');
+const percent=Math.min(speed,100)/100;
+const degrees=percent*360;
+meter.style.background=`conic-gradient(#22c55e ${degrees}deg,#1e293b ${degrees}deg)`;
+meterText.innerText=speed.toFixed(2)+' Mbps';
 }
+
+async function testPing(){
+const start=performance.now();
+await fetch('https://speed.hetzner.de/1MB.bin?'+Math.random(),{cache:'no-store'});
+const end=performance.now();
+const ping=(end-start).toFixed(0);
+document.getElementById('ping').innerText=ping+' ms';
+}
+
+async function testDownloadSpeed(){
+const duration=10000;
+const testUrl='https://speed.hetzner.de/100MB.bin?'+Math.random();
+let startTime=performance.now();
+let bytesReceived=0;
+const controller=new AbortController();
+setTimeout(()=>controller.abort(),duration);
+try{
+const response=await fetch(testUrl,{signal:controller.signal,cache:'no-store'});
+const reader=response.body.getReader();
+while(true){
+const {done,value}=await reader.read();
+if(done) break;
+bytesReceived+=value.length;
+const elapsed=(performance.now()-startTime)/1000;
+const speedMbps=((bytesReceived*8)/elapsed/1024/1024);
+document.getElementById('download').innerText=speedMbps.toFixed(2)+' Mbps';
+updateMeter(speedMbps);
+}
+}catch(e){console.log('Download finished')}
+}
+
+btn.addEventListener('click',async ()=>{
+btn.disabled=true;
+document.getElementById('download').innerText='-- Mbps';
+document.getElementById('ping').innerText='-- ms';
+document.getElementById('meterText').innerText='0 Mbps';
+await testPing();
+await testDownloadSpeed();
+btn.disabled=false;
+});
 </script>
-
-
 </body>
 </html>
-
-
-
