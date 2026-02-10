@@ -53,75 +53,44 @@
 </div>
 
 <script>
-const btn=document.getElementById('btn');
-const meter=document.getElementById('meter');
-const meterText=document.getElementById('meterText');
-const downloadEl=document.getElementById('download');
-const uploadEl=document.getElementById('upload');
-const pingEl=document.getElementById('ping');
+async function testDownloadSpeed() {
+  const duration = 30000; // 30 seconds
+  const testUrl = "https://speed.hetzner.de/100MB.bin?cache=" + Math.random();
 
-function updateMeter(speed){
-  const max=100;const cap=Math.min(speed,max);
-  const deg=(cap/max)*180;
-  meter.style.background=`conic-gradient(#22c55e ${deg}deg,#1e293b ${deg}deg)`;
-  meterText.textContent=speed+' Mbps';
-}
+  let startTime = performance.now();
+  let bytesReceived = 0;
 
-async function testPing(){
-  const s=performance.now();
-  await fetch('https://www.cloudflare.com/cdn-cgi/trace',{cache:'no-store'});
-  return Math.round(performance.now()-s);
-}
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), duration);
 
-async function testDownloadAccurate(){
-  const rounds=3; // multiple rounds for accuracy
-  const size=10*1024*1024; // 10MB
-  let totalSpeed=0;
+  try {
+    const response = await fetch(testUrl, {
+      signal: controller.signal,
+      cache: "no-store"
+    });
 
-  for(let i=0;i<rounds;i++){
-    const url='https://speed.cloudflare.com/__down?bytes='+size+'&r='+Math.random();
-    const s=performance.now();
-    await fetch(url,{cache:'no-store'});
-    const e=performance.now();
-    const speed=(size*8)/((e-s)/1000)/1024/1024;
-    totalSpeed+=speed;
-    updateMeter(Math.round(speed));
+    const reader = response.body.getReader();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytesReceived += value.length;
+
+      const elapsed = (performance.now() - startTime) / 1000;
+      const speedMbps = ((bytesReceived * 8) / elapsed / 1024 / 1024).toFixed(2);
+
+      document.getElementById("downloadSpeed").innerText = speedMbps + " Mbps";
+      updateMeter(speedMbps);
+    }
+  } catch (e) {
+    console.log("Download test finished");
   }
-  return Math.round(totalSpeed/rounds);
+
+  clearTimeout(timeout);
 }
-
-async function testUpload(){
-  const size=2*1024*1024;
-  const data=new Uint8Array(size);
-  const s=performance.now();
-  await fetch('https://speed.cloudflare.com/__up',{method:'POST',body:data});
-  const e=performance.now();
-  return Math.round((size*8)/((e-s)/1000)/1024/1024);
-}
-
-btn.onclick=async()=>{
-  btn.disabled=true;
-  downloadEl.textContent='Testing...';
-  uploadEl.textContent='Testing...';
-  pingEl.textContent='Testing...';
-  updateMeter(0);
-
-  try{
-    const ping=await testPing();
-    pingEl.textContent=ping+' ms';
-
-    const download=await testDownloadAccurate();
-    downloadEl.textContent=download+' Mbps';
-    updateMeter(download);
-
-    const upload=await testUpload();
-    uploadEl.textContent=upload+' Mbps';
-  }catch(e){
-    downloadEl.textContent='Error';uploadEl.textContent='Error';pingEl.textContent='Error';
-  }
-  btn.disabled=false;
-};
 </script>
+
 
 </body>
 </html>
+
