@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyNetSpeed – Check Your Internet Speed</title>
+  <meta name="description" content="MyNetSpeed lets you check your real internet download speed, upload speed and ping instantly. Free speed test tool." />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #020617, #0f172a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: #020617;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      width: 340px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #22c55e;
+    }
+    p { font-size: 14px; opacity: 0.8; }
+
+    button {
+      padding: 14px 22px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #22c55e;
+      color: #000;
+      margin-top: 20px;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>MyNetSpeed</h1>
+    <p>Check your real internet speed instantly</p>
+
+    <button id="startBtn">Start Speed Test</button>
+
+    <div class="result" id="result">
+      Download: -- Mbps<br>
+      Upload: -- Mbps<br>
+      Ping: -- ms
+    </div>
+
+    <footer>
+      © 2026 MyNetSpeed
+    </footer>
+  </div>
+
+  <script>
+    const btn = document.getElementById('startBtn');
+    const result = document.getElementById('result');
+
+    async function testDownload() {
+      const size = 5 * 1024 * 1024;
+      const url = 'https://speed.cloudflare.com/__down?bytes=' + size;
+      const start = performance.now();
+      await fetch(url, { cache: 'no-store' });
+      const end = performance.now();
+      return ((size * 8) / ((end - start) / 1000) / 1024 / 1024).toFixed(2);
+    }
+
+    async function testPing() {
+      const start = performance.now();
+      await fetch('https://www.cloudflare.com/cdn-cgi/trace', { cache: 'no-store' });
+      return Math.round(performance.now() - start);
+    }
+
+    btn.onclick = async () => {
+      btn.disabled = true;
+      result.innerHTML = 'Testing... please wait';
+
+      try {
+        const ping = await testPing();
+        result.innerHTML = `Ping: ${ping} ms<br>Testing download...`;
+        const download = await testDownload();
+
+        result.innerHTML = `
+          Download: <b>${download} Mbps</b><br>
+          Upload: <b>Coming Soon</b><br>
+          Ping: <b>${ping} ms</b>
+        `;
+      } catch (e) {
+        result.innerHTML = 'Test failed. Please try again.';
+      }
+
+      btn.disabled = false;
+    };
+  </script>
+</body>
+</html>
