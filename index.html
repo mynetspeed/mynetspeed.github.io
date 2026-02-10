@@ -3,90 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyNetSpeed – Check Your Internet Speed</title>
-  <meta name="description" content="MyNetSpeed lets you check your real internet download speed, upload speed and ping instantly. Free speed test tool." />
+  <title>MyNetSpeed – Internet Speed Test</title>
+  <meta name="description" content="MyNetSpeed – Check your real download speed, upload speed and ping online. Fast, free and accurate internet speed test." />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #020617, #0f172a);
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #020617, #020617, #0f172a);
       color: #fff;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
     }
-    .box {
+
+    .card {
+      width: 380px;
       background: #020617;
-      padding: 30px;
-      border-radius: 16px;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
       text-align: center;
-      width: 340px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.6);
     }
+
     h1 {
-      margin-bottom: 10px;
+      margin: 0;
       color: #22c55e;
+      font-size: 28px;
     }
-    p { font-size: 14px; opacity: 0.8; }
+
+    .sub {
+      font-size: 14px;
+      opacity: 0.75;
+      margin-bottom: 25px;
+    }
+
+    .speed-box {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 25px;
+    }
+
+    .item {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .label {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 4px;
+      color: #38bdf8;
+    }
 
     button {
-      padding: 14px 22px;
+      width: 100%;
+      padding: 14px;
       font-size: 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      background: #22c55e;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
       color: #000;
-      margin-top: 20px;
+      font-weight: bold;
     }
+
     button:disabled {
-      background: #555;
+      opacity: 0.6;
       cursor: not-allowed;
     }
-    .result {
-      margin-top: 20px;
-      font-size: 16px;
-      line-height: 1.6;
-    }
+
     footer {
       margin-top: 20px;
       font-size: 12px;
-      opacity: 0.6;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-  <div class="box">
+
+  <div class="card">
     <h1>MyNetSpeed</h1>
-    <p>Check your real internet speed instantly</p>
+    <div class="sub">Real-time Internet Speed Test</div>
 
-    <button id="startBtn">Start Speed Test</button>
-
-    <div class="result" id="result">
-      Download: -- Mbps<br>
-      Upload: -- Mbps<br>
-      Ping: -- ms
+    <div class="speed-box">
+      <div class="item">
+        <div class="label">Download Speed</div>
+        <div class="value" id="download">-- Mbps</div>
+      </div>
+      <div class="item">
+        <div class="label">Upload Speed</div>
+        <div class="value" id="upload">-- Mbps</div>
+      </div>
+      <div class="item">
+        <div class="label">Ping</div>
+        <div class="value" id="ping">-- ms</div>
+      </div>
     </div>
 
-    <footer>
-      © 2026 MyNetSpeed
-    </footer>
+    <button id="btn">Start Test</button>
+
+    <footer>© 2026 MyNetSpeed</footer>
   </div>
 
   <script>
-    const btn = document.getElementById('startBtn');
-    const result = document.getElementById('result');
-
-    async function testDownload() {
-      const size = 5 * 1024 * 1024;
-      const url = 'https://speed.cloudflare.com/__down?bytes=' + size;
-      const start = performance.now();
-      await fetch(url, { cache: 'no-store' });
-      const end = performance.now();
-      return ((size * 8) / ((end - start) / 1000) / 1024 / 1024).toFixed(2);
-    }
+    const btn = document.getElementById('btn');
+    const downloadEl = document.getElementById('download');
+    const uploadEl = document.getElementById('upload');
+    const pingEl = document.getElementById('ping');
 
     async function testPing() {
       const start = performance.now();
@@ -94,26 +126,52 @@
       return Math.round(performance.now() - start);
     }
 
+    async function testDownload() {
+      const size = 8 * 1024 * 1024; // 8MB
+      const url = 'https://speed.cloudflare.com/__down?bytes=' + size;
+      const start = performance.now();
+      await fetch(url, { cache: 'no-store' });
+      const end = performance.now();
+      return ((size * 8) / ((end - start) / 1000) / 1024 / 1024).toFixed(2);
+    }
+
+    async function testUpload() {
+      const size = 2 * 1024 * 1024; // 2MB
+      const data = new Uint8Array(size);
+      const start = performance.now();
+      await fetch('https://speed.cloudflare.com/__up', {
+        method: 'POST',
+        body: data
+      });
+      const end = performance.now();
+      return ((size * 8) / ((end - start) / 1000) / 1024 / 1024).toFixed(2);
+    }
+
     btn.onclick = async () => {
       btn.disabled = true;
-      result.innerHTML = 'Testing... please wait';
+      downloadEl.textContent = 'Testing...';
+      uploadEl.textContent = 'Testing...';
+      pingEl.textContent = 'Testing...';
 
       try {
         const ping = await testPing();
-        result.innerHTML = `Ping: ${ping} ms<br>Testing download...`;
-        const download = await testDownload();
+        pingEl.textContent = ping + ' ms';
 
-        result.innerHTML = `
-          Download: <b>${download} Mbps</b><br>
-          Upload: <b>Coming Soon</b><br>
-          Ping: <b>${ping} ms</b>
-        `;
+        const download = await testDownload();
+        downloadEl.textContent = download + ' Mbps';
+
+        const upload = await testUpload();
+        uploadEl.textContent = upload + ' Mbps';
       } catch (e) {
-        result.innerHTML = 'Test failed. Please try again.';
+        downloadEl.textContent = 'Error';
+        uploadEl.textContent = 'Error';
+        pingEl.textContent = 'Error';
       }
 
       btn.disabled = false;
     };
   </script>
+
 </body>
 </html>
+
