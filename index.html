@@ -4,227 +4,124 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MyNetSpeed – Internet Speed Test</title>
-  <meta name="description" content="MyNetSpeed – Check your internet speed with live meter. Download, upload and ping test." />
+  <meta name="description" content="MyNetSpeed – Accurate internet speed test with live meter. Download, upload and ping." />
 
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: radial-gradient(circle at top, #020617, #000);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    body{
+      margin:0;font-family:'Segoe UI',Tahoma,sans-serif;
+      background:radial-gradient(circle at top,#020617,#000);
+      color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;
     }
+    .card{width:380px;background:#020617;border-radius:20px;padding:28px;box-shadow:0 25px 50px rgba(0,0,0,.8);text-align:center}
+    h1{margin:0;color:#22c55e;font-size:28px}
+    .sub{font-size:14px;opacity:.7;margin-bottom:20px}
 
-    .card {
-      width: 380px;
-      background: #020617;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-      text-align: center;
-    }
+    .meter-wrap{width:220px;height:110px;margin:0 auto 20px;position:relative;overflow:hidden}
+    .meter{width:220px;height:220px;border-radius:50%;background:conic-gradient(#22c55e 0deg,#1e293b 0deg);position:absolute;bottom:0;left:0;transition:background .3s}
+    .meter-center{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:170px;height:85px;background:#020617;border-top-left-radius:170px;border-top-right-radius:170px;display:flex;justify-content:center;align-items:center;font-size:22px;font-weight:bold;color:#38bdf8}
 
-    h1 {
-      margin: 0;
-      color: #22c55e;
-      font-size: 28px;
-    }
+    .speed-box{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .item{background:#0f172a;border-radius:12px;padding:12px}
+    .label{font-size:12px;opacity:.6}
+    .value{font-size:18px;font-weight:bold;margin-top:4px;color:#38bdf8}
 
-    .sub {
-      font-size: 14px;
-      opacity: 0.7;
-      margin-bottom: 20px;
-    }
-
-    .meter-wrap {
-      width: 220px;
-      height: 110px;
-      margin: 0 auto 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .meter {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: conic-gradient(#22c55e 0deg, #1e293b 0deg);
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      transition: background 0.4s ease;
-    }
-
-    .meter-center {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 170px;
-      height: 85px;
-      background: #020617;
-      border-top-left-radius: 170px;
-      border-top-right-radius: 170px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: #38bdf8;
-    }
-
-    .speed-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .item {
-      background: #0f172a;
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    .label {
-      font-size: 12px;
-      opacity: 0.6;
-    }
-
-    .value {
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 4px;
-      color: #38bdf8;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #22c55e, #4ade80);
-      color: #000;
-      font-weight: bold;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-    }
-
-    footer {
-      margin-top: 16px;
-      font-size: 12px;
-      opacity: 0.45;
-    }
+    button{width:100%;padding:14px;font-size:16px;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,#22c55e,#4ade80);color:#000;font-weight:bold}
+    button:disabled{opacity:.6}
+    footer{margin-top:16px;font-size:12px;opacity:.45}
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>MyNetSpeed</h1>
-    <div class="sub">Live Internet Speed Meter</div>
+<div class="card">
+  <h1>MyNetSpeed</h1>
+  <div class="sub">Accurate Live Speed Test</div>
 
-    <div class="meter-wrap">
-      <div class="meter" id="meter"></div>
-      <div class="meter-center" id="meterText">0 Mbps</div>
-    </div>
-
-    <div class="speed-box">
-      <div class="item">
-        <div class="label">Download</div>
-        <div class="value" id="download">-- Mbps</div>
-      </div>
-      <div class="item">
-        <div class="label">Upload</div>
-        <div class="value" id="upload">-- Mbps</div>
-      </div>
-      <div class="item">
-        <div class="label">Ping</div>
-        <div class="value" id="ping">-- ms</div>
-      </div>
-      <div class="item">
-        <div class="label">Line Type</div>
-        <div class="value">Broadband</div>
-      </div>
-    </div>
-
-    <button id="btn">Start Test</button>
-
-    <footer>Result may vary depending on browser & server</footer>
+  <div class="meter-wrap">
+    <div class="meter" id="meter"></div>
+    <div class="meter-center" id="meterText">0 Mbps</div>
   </div>
 
-  <script>
-    const btn = document.getElementById('btn');
-    const meter = document.getElementById('meter');
-    const meterText = document.getElementById('meterText');
-    const downloadEl = document.getElementById('download');
-    const uploadEl = document.getElementById('upload');
-    const pingEl = document.getElementById('ping');
+  <div class="speed-box">
+    <div class="item"><div class="label">Download</div><div class="value" id="download">-- Mbps</div></div>
+    <div class="item"><div class="label">Upload</div><div class="value" id="upload">-- Mbps</div></div>
+    <div class="item"><div class="label">Ping</div><div class="value" id="ping">-- ms</div></div>
+    <div class="item"><div class="label">Test Time</div><div class="value">~8 sec</div></div>
+  </div>
 
-    function updateMeter(speed) {
-      const max = 100; // cap for display
-      const capped = Math.min(speed, max);
-      const deg = (capped / max) * 180;
-      meter.style.background = `conic-gradient(#22c55e ${deg}deg, #1e293b ${deg}deg)`;
-      meterText.textContent = speed + ' Mbps';
-    }
+  <button id="btn">Start Test</button>
+  <footer>Longer test = more accurate result</footer>
+</div>
 
-    async function testPing() {
-      const start = performance.now();
-      await fetch('https://www.cloudflare.com/cdn-cgi/trace', { cache: 'no-store' });
-      return Math.round(performance.now() - start);
-    }
+<script>
+const btn=document.getElementById('btn');
+const meter=document.getElementById('meter');
+const meterText=document.getElementById('meterText');
+const downloadEl=document.getElementById('download');
+const uploadEl=document.getElementById('upload');
+const pingEl=document.getElementById('ping');
 
-    async function testDownload() {
-      const size = 6 * 1024 * 1024;
-      const url = 'https://speed.cloudflare.com/__down?bytes=' + size;
-      const start = performance.now();
-      await fetch(url, { cache: 'no-store' });
-      const end = performance.now();
-      return Math.round((size * 8) / ((end - start) / 1000) / 1024 / 1024);
-    }
+function updateMeter(speed){
+  const max=100;const cap=Math.min(speed,max);
+  const deg=(cap/max)*180;
+  meter.style.background=`conic-gradient(#22c55e ${deg}deg,#1e293b ${deg}deg)`;
+  meterText.textContent=speed+' Mbps';
+}
 
-    async function testUpload() {
-      const size = 1 * 1024 * 1024;
-      const data = new Uint8Array(size);
-      const start = performance.now();
-      await fetch('https://speed.cloudflare.com/__up', { method: 'POST', body: data });
-      const end = performance.now();
-      return Math.round((size * 8) / ((end - start) / 1000) / 1024 / 1024);
-    }
+async function testPing(){
+  const s=performance.now();
+  await fetch('https://www.cloudflare.com/cdn-cgi/trace',{cache:'no-store'});
+  return Math.round(performance.now()-s);
+}
 
-    btn.onclick = async () => {
-      btn.disabled = true;
-      downloadEl.textContent = 'Testing';
-      uploadEl.textContent = 'Testing';
-      pingEl.textContent = 'Testing';
-      updateMeter(0);
+async function testDownloadAccurate(){
+  const rounds=3; // multiple rounds for accuracy
+  const size=10*1024*1024; // 10MB
+  let totalSpeed=0;
 
-      try {
-        const ping = await testPing();
-        pingEl.textContent = ping + ' ms';
+  for(let i=0;i<rounds;i++){
+    const url='https://speed.cloudflare.com/__down?bytes='+size+'&r='+Math.random();
+    const s=performance.now();
+    await fetch(url,{cache:'no-store'});
+    const e=performance.now();
+    const speed=(size*8)/((e-s)/1000)/1024/1024;
+    totalSpeed+=speed;
+    updateMeter(Math.round(speed));
+  }
+  return Math.round(totalSpeed/rounds);
+}
 
-        const download = await testDownload();
-        downloadEl.textContent = download + ' Mbps';
-        updateMeter(download);
+async function testUpload(){
+  const size=2*1024*1024;
+  const data=new Uint8Array(size);
+  const s=performance.now();
+  await fetch('https://speed.cloudflare.com/__up',{method:'POST',body:data});
+  const e=performance.now();
+  return Math.round((size*8)/((e-s)/1000)/1024/1024);
+}
 
-        const upload = await testUpload();
-        uploadEl.textContent = upload + ' Mbps';
-      } catch (e) {
-        downloadEl.textContent = 'Error';
-        uploadEl.textContent = 'Error';
-        pingEl.textContent = 'Error';
-      }
+btn.onclick=async()=>{
+  btn.disabled=true;
+  downloadEl.textContent='Testing...';
+  uploadEl.textContent='Testing...';
+  pingEl.textContent='Testing...';
+  updateMeter(0);
 
-      btn.disabled = false;
-    };
-  </script>
+  try{
+    const ping=await testPing();
+    pingEl.textContent=ping+' ms';
+
+    const download=await testDownloadAccurate();
+    downloadEl.textContent=download+' Mbps';
+    updateMeter(download);
+
+    const upload=await testUpload();
+    uploadEl.textContent=upload+' Mbps';
+  }catch(e){
+    downloadEl.textContent='Error';uploadEl.textContent='Error';pingEl.textContent='Error';
+  }
+  btn.disabled=false;
+};
+</script>
 
 </body>
 </html>
